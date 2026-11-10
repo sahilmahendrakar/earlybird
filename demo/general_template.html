@@ -1,0 +1,191 @@
+<title>Earlybird Writes Ahead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F5F7; --surface:#FFFFFF; --ink:#13161B; --muted:#5D6574; --faint:#8C94A2; --line:#DCE0E6;
+  --dawn:#C85A0C; --dawn-mark:#E8761E; --dawn-soft:#FCEBDD; --slate:#44567A; --slate-mark:#6F84AD; --slate-soft:#E5EAF3;
+  --spoken:#13161B; --unspoken:#B5BBC5;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme:dark; --ground:#0F1216; --surface:#171B21; --ink:#E9ECF1; --muted:#A0A8B6; --faint:#6C7482; --line:#2A3039;
+  --dawn:#F39A55; --dawn-mark:#F08A3C; --dawn-soft:#3A2416; --slate:#A9BADB; --slate-mark:#8197C2; --slate-soft:#1E2634;
+  --spoken:#E9ECF1; --unspoken:#4A515D; } }
+:root[data-theme="dark"]{
+  color-scheme:dark; --ground:#0F1216; --surface:#171B21; --ink:#E9ECF1; --muted:#A0A8B6; --faint:#6C7482; --line:#2A3039;
+  --dawn:#F39A55; --dawn-mark:#F08A3C; --dawn-soft:#3A2416; --slate:#A9BADB; --slate-mark:#8197C2; --slate-soft:#1E2634;
+  --spoken:#E9ECF1; --unspoken:#4A515D; }
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:20px;padding-block:36px 56px;display:flex;flex-direction:column;gap:26px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.05;letter-spacing:-0.02em;margin:0;text-wrap:balance}
+.lede{margin:10px 0 0;max-width:66ch;color:var(--muted);font-size:16px;text-wrap:pretty}.lede b{color:var(--ink);font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fact{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.fact .k{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fact .v{font-family:var(--mono);font-size:20px;font-variant-numeric:tabular-nums;color:var(--dawn)}
+.fact .s{font-size:12.5px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.picker{display:flex;flex-wrap:wrap;gap:8px}
+.picker button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;display:flex;gap:8px;align-items:baseline}
+.picker button .src{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+.picker button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+button:focus-visible,input:focus-visible,.bar:focus-visible{outline:2px solid var(--dawn-mark);outline-offset:2px}
+.slider{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.slider input{width:180px;accent-color:var(--dawn-mark)}
+.slider output{font-family:var(--mono);color:var(--ink);min-width:3.5ch}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.ctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.play{font:inherit;font-weight:600;background:var(--ink);color:var(--ground);border:0;border-radius:999px;padding:9px 18px 9px 14px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.play svg{width:14px;height:14px;fill:currentColor}
+.rate{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.rate button{font:inherit;font-size:12.5px;background:transparent;color:var(--muted);border:0;padding:6px 11px;cursor:pointer}
+.rate button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.clock{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.label{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bar{position:relative;height:34px;cursor:pointer;touch-action:none}
+.bar .track{position:absolute;left:0;right:0;top:15px;height:4px;border-radius:2px;background:var(--line)}
+.bar .fill{position:absolute;left:0;top:15px;height:4px;border-radius:2px;background:var(--ink)}
+.bar .tick{position:absolute;top:9px;width:1px;height:16px;background:var(--faint);opacity:.55}
+.bar .head{position:absolute;top:8px;width:2px;height:18px;background:var(--ink);transform:translateX(-1px)}
+.heard{font-family:var(--display);font-weight:500;font-size:clamp(20px,2.8vw,26px);line-height:1.6;margin:0;text-wrap:pretty}
+.heard .w{color:var(--unspoken);border-bottom:3px solid transparent}
+.heard .w.on{color:var(--spoken)}
+.heard .w.e{border-bottom-color:var(--dawn-mark)}
+.legend{font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.legend i{display:inline-block;width:18px;height:3px;background:var(--dawn-mark);vertical-align:middle;margin-right:6px}
+.lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.lane{border-radius:10px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-height:170px;background:var(--slate-soft)}
+.lane.main{background:var(--dawn-soft)}
+.lane h2{margin:0;font-family:var(--display);font-weight:700;font-size:17px;color:var(--slate)}
+.lane.main h2{color:var(--dawn)}
+.lane .sub{font-size:12px;color:var(--muted);margin-top:-6px}
+.text{font-size:17px;line-height:1.55;margin:0;min-height:3.1em;overflow-wrap:anywhere}
+.g{color:var(--faint);border-bottom:2px dotted var(--faint)}
+.g sup{font-family:var(--mono);font-size:10.5px;margin-left:2px;color:var(--muted)}
+.count{margin-top:auto;font-size:13px;color:var(--muted)}
+.count b{font-family:var(--mono);font-size:18px;color:var(--ink);font-weight:500}
+.notes{font-size:13px;color:var(--muted);max-width:76ch;display:flex;flex-direction:column;gap:8px}
+.notes h3{font-family:var(--display);font-size:15px;color:var(--ink);margin:0}.notes p{margin:0}
+.tbl{overflow-x:auto}.tbl table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;min-width:560px}
+.tbl th,.tbl td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right}.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl th{font-weight:500;color:var(--muted);font-size:12px}
+@media (max-width:680px){.facts{grid-template-columns:1fr}.stage{padding:16px}.clock{margin-left:0}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Earlybird Writes Ahead</h1>
+    <p class="lede">A 29M on-device streaming speech recognizer that writes what you have said <b>and guesses the words you are about to say</b>, each with a confidence you can trust. Same clips, side by side with the usual alternative: a separate text model guessing from the transcript.</p>
+  </header>
+  <section class="facts" id="facts" aria-label="Headline numbers"></section>
+  <nav class="picker" id="picker" aria-label="Choose a clip"></nav>
+  <div class="row">
+    <label class="slider" for="thr">Show guesses at confidence ≥ <input type="range" id="thr" min="0.3" max="0.95" step="0.05" value="0.5"><output id="thrv">0.50</output></label>
+  </div>
+  <section class="stage" aria-label="Replay">
+    <div class="ctrl">
+      <button class="play" id="play" type="button"><svg viewBox="0 0 14 14" id="icon"><path d="M2 1l11 6-11 6z"/></svg><span id="playtxt">Play</span></button>
+      <div class="rate" role="group" aria-label="Playback speed"><button type="button" data-r="1" aria-pressed="true">1×</button><button type="button" data-r="0.5" aria-pressed="false">0.5×</button></div>
+      <span class="clock" id="clock">0.00 s</span>
+    </div>
+    <div>
+      <div class="label"><span>What was said</span><span id="src"></span></div>
+      <div class="bar" id="bar" tabindex="0" role="slider" aria-label="Position in clip" aria-valuemin="0">
+        <div class="track"></div><div class="fill" id="fill"></div><div id="ticks"></div><div class="head" id="head"></div>
+      </div>
+      <p class="heard" id="heard"></p>
+      <div class="legend"><span><i></i>Earlybird showed this word right, and kept it right, from before the speaker finished saying it (as text or as a guess above the threshold)</span></div>
+    </div>
+    <div class="lanes" id="lanes"></div>
+  </section>
+  <section class="notes" id="tables"></section>
+  <section class="notes">
+    <h3>How this was recorded</h3>
+    <p>Every system ran on the same audio in 80 ms steps; each change to its text and guesses was logged against the audio clock and is replayed here (compute time not added). Grey dotted words are guesses with their confidence, shown only above the slider's threshold. Each lane counts the words it showed correctly before the speaker finished saying them and never took back afterwards, either in its transcript or as a guess at or above the threshold. A word that flickers (shown, removed, shown again) only counts from the last time it appeared. A normal streaming recognizer gets many words this way too, by writing a word in its last few tens of milliseconds.</p>
+    <p>Clips: LibriSpeech test-clean (audiobooks), TED-LIUM (talks), People's Speech (public speech), and synthetic Kokoro speech; chosen by the builder as a spread where Earlybird anticipated several words. The numbers above cover full test sets.</p>
+  </section>
+</div>
+<script>
+const DATA = __DATA__;
+const CLIPS = DATA.clips, $ = id => document.getElementById(id);
+const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const norm = s => (s||"").toLowerCase().replace(/[^a-z0-9' ]+/g," ").split(/\s+/).filter(Boolean);
+const SETN = {librispeech_test_clean:"audiobook", tedlium_test:"talk", ps_test:"public speech", kokoro_test:"synthetic"};
+let cur = 0, thr = 0.5, raf = null, rate = 1, endedAt = null;
+const audio = new Audio(); audio.preload = "auto";
+const at = (ev, t) => { let v = null; for (const e of ev) { if (e[0] <= t + 1e-6) v = e; else break; } return v; };
+// words a lane showed right AND kept right from before they ended (the time they became right for good),
+// as transcript text or as a guess at or above the threshold; only words whose time is <= t are returned
+function shownAt(e, ref) {
+  const h = norm(e[1]); let k = 0; while (k < h.length && k < ref.length && h[k] === ref[k]) k++;
+  const s = new Set(); for (let j = 0; j < k; j++) s.add(j);
+  if (k === h.length) { const g = norm(e[2]), wp = e[3] || [];
+    for (let j = 0; j < g.length && k + j < ref.length; j++) { if ((wp[j] ?? 0) < thr || g[j] !== ref[k + j]) break; s.add(k + j); } }
+  return s;
+}
+function early(c, lane, t) {
+  const ref = c.words.map(w => w[0]), cur = new Map();
+  for (const e of lane.ev) { const s = shownAt(e, ref);
+    for (const j of [...cur.keys()]) if (!s.has(j)) cur.delete(j);
+    for (const j of s) if (!cur.has(j)) cur.set(j, e[0]); }
+  const got = new Set(); for (const [j, t0] of cur) if (t0 < c.words[j][2] && t0 <= t) got.add(j);
+  return got;
+}
+function facts() {
+  const f = DATA.stats || {};
+  $("facts").innerHTML = (f.cards || []).map(c => `<div class="fact"><span class="k">${esc(c.k)}</span><span class="v">${esc(c.v)}</span><span class="s">${esc(c.s)}</span></div>`).join("");
+  if (!(f.cards || []).length) $("facts").hidden = true;
+  const ts = (f.table ? [f.table] : []).concat(f.tables || []);
+  $("tables").innerHTML = ts.map(x => `<h3>${esc(x.title)}</h3><div class="tbl">${x.html}</div><p>${esc(x.note || "")}</p>`).join("");
+}
+CLIPS.forEach((c, i) => {
+  const b = document.createElement("button"); b.type = "button"; b.id = "clip" + i;
+  const w = c.text.split(" ").slice(0, 4).join(" ");
+  b.innerHTML = `<span>${esc(w)}…</span><span class="src">${esc(SETN[c.set] || c.set)}</span>`;
+  b.addEventListener("click", () => select(i)); $("picker").appendChild(b);
+});
+function select(i) {
+  stop(); cur = i; endedAt = null; const c = CLIPS[i];
+  document.querySelectorAll(".picker button").forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+  audio.src = c.audio; audio.playbackRate = rate; audio.currentTime = 0;
+  $("src").textContent = (SETN[c.set] || c.set) + " · " + c.id;
+  $("heard").innerHTML = c.words.map((w, k) => `<span class="w" data-k="${k}">${esc(w[0])}</span>`).join(" ");
+  const total = c.dur + 1; $("bar").setAttribute("aria-valuemax", total.toFixed(2));
+  $("ticks").innerHTML = c.words.map(w => `<span class="tick" style="left:${(w[2] / total * 100).toFixed(2)}%"></span>`).join("");
+  $("lanes").innerHTML = c.lanes.map((l, j) => `<div class="lane${l.main ? " main" : ""}"><h2>${esc(l.name)}</h2><div class="sub">${esc(l.sub)}</div><p class="text" id="lt${j}"></p><div class="count"><b id="lc${j}">0</b> words shown right before they were finished, and never taken back</div></div>`).join("");
+  render(c.dur + 1);
+}
+function render(t) {
+  const c = CLIPS[cur], total = c.dur + 1, p = Math.min(1, t / total) * 100;
+  $("fill").style.width = p + "%"; $("head").style.left = p + "%"; $("bar").setAttribute("aria-valuenow", t.toFixed(2));
+  $("clock").textContent = Math.min(t, total).toFixed(2) + " s";
+  const mainEarly = early(c, c.lanes[0], t);
+  document.querySelectorAll("#heard .w").forEach(el => { const k = +el.dataset.k; el.classList.toggle("on", c.words[k][2] <= t); el.classList.toggle("e", mainEarly.has(k)); });
+  c.lanes.forEach((l, j) => {
+    const e = at(l.ev, t); let html = "";
+    if (e) {
+      html = esc(e[1]); const gw = (e[2] || "").split(/\s+/).filter(Boolean), wp = e[3] || [];
+      for (let k = 0; k < gw.length; k++) { const q = wp[k] ?? 0; if (q < thr) break; html += ` <span class="g">${esc(gw[k])}<sup>${Math.round(q * 100)}%</sup></span>`; }
+    }
+    $("lt" + j).innerHTML = html || "&nbsp;";
+    $("lc" + j).textContent = (j === 0 ? mainEarly : early(c, l, t)).size;
+  });
+}
+function clockNow() { const c = CLIPS[cur]; return endedAt !== null ? Math.min(c.dur + 1, c.dur + (performance.now() - endedAt) / 1000 * rate) : audio.currentTime; }
+function loop() { const t = clockNow(); render(t); if (endedAt !== null && t >= CLIPS[cur].dur + 1) { stop(false); return; } raf = requestAnimationFrame(loop); }
+function setPlaying(on) { $("playtxt").textContent = on ? "Pause" : "Play"; $("icon").innerHTML = on ? '<path d="M2 1h3.5v12H2zM8.5 1H12v12H8.5z"/>' : '<path d="M2 1l11 6-11 6z"/>'; }
+function stop(pause = true) { if (pause) audio.pause(); cancelAnimationFrame(raf); raf = null; setPlaying(false); }
+audio.addEventListener("ended", () => { endedAt = performance.now(); });
+$("play").addEventListener("click", () => {
+  if (raf) { stop(); return; }
+  const c = CLIPS[cur]; if (endedAt !== null || audio.currentTime >= c.dur - 0.05) audio.currentTime = 0; endedAt = null;
+  audio.play().then(() => { setPlaying(true); raf = requestAnimationFrame(loop); }).catch(() => { $("playtxt").textContent = "Tap again to play"; });
+});
+document.querySelectorAll(".rate button").forEach(b => b.addEventListener("click", () => { rate = +b.dataset.r; audio.playbackRate = rate; document.querySelectorAll(".rate button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false")); }));
+$("thr").addEventListener("input", e => { thr = +e.target.value; $("thrv").textContent = thr.toFixed(2); if (!raf) render(endedAt !== null || audio.currentTime === 0 ? CLIPS[cur].dur + 1 : audio.currentTime); });
+function seek(x) { const r = $("bar").getBoundingClientRect(), c = CLIPS[cur]; const t = Math.max(0, Math.min(1, (x - r.left) / r.width)) * (c.dur + 1); endedAt = null; audio.currentTime = Math.min(t, c.dur); render(t); }
+$("bar").addEventListener("pointerdown", e => seek(e.clientX));
+$("bar").addEventListener("keydown", e => { const c = CLIPS[cur]; let t = audio.currentTime; if (e.key === "ArrowRight") t += 0.25; else if (e.key === "ArrowLeft") t -= 0.25; else return; e.preventDefault(); t = Math.max(0, Math.min(c.dur, t)); endedAt = null; audio.currentTime = t; render(t); });
+facts(); select(0);
+</script>

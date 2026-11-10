@@ -1,0 +1,203 @@
+<title>Earlybird, Listening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Instrument+Serif:ital@1&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#ffffff; --ink:#0b0c0e; --ink-2:#3b3f47; --muted:#7a808c; --hair:#e4e7ec; --soft:#f5f6f8;
+  --accent:#3a7bd5; --accent-soft:#eaf3ff; --pend:#a3a9b3; --ghost:#9aa3b2;
+  --sans:"Urbanist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Instrument Serif","Iowan Old Style",Georgia,serif;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --gut:clamp(16px,4vw,48px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0a0b0e; --ink:#f1f2f4; --ink-2:#c4c8d0; --muted:#868c98; --hair:#23262e; --soft:#13151a;
+  --accent:#78a6ec; --accent-soft:#122238; --pend:#5d636e; --ghost:#6c7483; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0a0b0e; --ink:#f1f2f4; --ink-2:#c4c8d0; --muted:#868c98; --hair:#23262e; --soft:#13151a;
+  --accent:#78a6ec; --accent-soft:#122238; --pend:#5d636e; --ghost:#6c7483; color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.page{min-height:100dvh;padding-inline:var(--gut);display:grid;grid-template-rows:auto 1fr auto}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:22px;font:500 14px var(--sans);color:var(--muted)}
+.brand{display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em;color:var(--ink)}
+.brand svg{width:24px;height:24px}
+main{width:100%;max-width:880px;margin:0 auto;padding-block:20px 64px}
+.kicker{font:500 13px var(--mono);color:var(--muted);letter-spacing:.02em;margin:0 0 12px}
+h1{font-size:clamp(32px,4.6vw,48px);font-weight:500;letter-spacing:-.04em;line-height:1.05;margin:0 0 14px;text-wrap:balance}
+h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em}
+.lede{font-size:18px;line-height:1.55;color:var(--ink-2);margin:0 0 26px;max-width:640px}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:18px}
+.pick{border:1px solid var(--hair);background:var(--paper);color:var(--ink);border-radius:12px;padding:12px 14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,box-shadow .15s}
+.pick:hover{border-color:var(--pend)}
+.pick[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.pick .cat{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pick[aria-pressed="true"] .cat{color:var(--accent)}
+.pick .first{font-size:15px;line-height:1.35;color:var(--ink-2)}
+.stage{border:1px solid var(--hair);border-radius:18px;padding:22px clamp(16px,3vw,28px) 20px;background:var(--paper);display:grid;gap:18px}
+.ctrl{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.play{width:52px;height:52px;border-radius:50%;border:0;background:var(--ink);color:var(--paper);display:grid;place-items:center;cursor:pointer;flex:none}
+.play svg{width:18px;height:18px;fill:currentColor}
+.track{flex:1;min-width:180px;position:relative;height:40px;cursor:pointer;touch-action:none}
+.track canvas{width:100%;height:100%;display:block}
+.clock{font:13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;min-width:86px;text-align:right}
+.speed{display:flex;border:1px solid var(--hair);border-radius:999px;overflow:hidden}
+.speed button{border:0;background:transparent;color:var(--muted);font:500 12.5px var(--sans);padding:6px 11px;cursor:pointer}
+.speed button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.screen{min-height:168px;font-size:clamp(23px,3vw,31px);line-height:1.5;letter-spacing:-.01em;color:var(--ink);overflow-wrap:anywhere}
+.screen .w{position:relative;display:inline;border-radius:6px;transition:background .25s,color .25s}
+.screen .w::after{content:"";position:absolute;left:1px;right:1px;bottom:-3px;height:3px;border-radius:2px;background:var(--accent);opacity:var(--c,0);transition:opacity .25s}
+.screen .w.now{background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.screen .w.low{color:var(--ink-2)}
+.screen .g{color:var(--ghost);font-style:italic;font-weight:400}
+.screen .g sup{font:500 11px var(--mono);font-style:normal;color:var(--ghost);margin-left:3px;vertical-align:.9em;letter-spacing:0}
+.screen .caret{display:inline-block;width:2px;height:.95em;background:var(--accent);vertical-align:-.12em;margin:0 3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.screen .hint{color:var(--pend);font-size:18px}
+.meters{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px}
+.meter{background:var(--soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-height:84px}
+.meter .k{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.meter .v{font-size:19px;font-weight:600;color:var(--ink);min-height:1.3em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meter.ghost .v{color:var(--ghost);font-style:italic;font-weight:500}
+.bar{height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:3px;transition:width .2s}
+.meter.ghost .bar i{background:var(--ghost)}
+.meter .pct{font:13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.said{font-size:15px;line-height:1.55;color:var(--muted);border-top:1px solid var(--hair);padding-top:14px}
+.said b{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.said .s{color:var(--hair);transition:color .1s}
+.said .s.on{color:var(--ink-2)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--muted);margin-top:16px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.lg-u{display:inline-block;width:22px;height:3px;border-radius:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 25%,transparent),var(--accent))}
+.lg-now{display:inline-block;width:18px;height:14px;border-radius:4px;background:var(--accent-soft)}
+.lg-g{font-style:italic;color:var(--ghost)}
+.tip{font-size:14.5px;color:var(--ink-2);background:var(--soft);border-radius:10px;padding:10px 14px;margin:0 0 14px}
+.note{font-size:13.5px;color:var(--muted);line-height:1.55;margin-top:14px;max-width:700px}
+.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:18px calc(18px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--hair);font:12px var(--mono);color:var(--muted)}
+@media (max-width:640px){.meters{grid-template-columns:1fr}.screen{min-height:200px}}
+@media (prefers-reduced-motion:reduce){.screen .w,.screen .w::after,.bar i{transition:none}.screen .caret{animation:none}}
+</style>
+
+<div class="page">
+<header class="nav">
+  <span class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="14.5" cy="12" r="4" fill="currentColor"/></svg>Earlybird</span>
+  <span>Research · Earlybird</span>
+</header>
+<main>
+  <p class="kicker">Demo · recorded samples</p>
+  <h1>Earlybird, <em>listening</em></h1>
+  <p class="lede">Press play and watch a 17 MB model write what it hears as it hears it: the word being spoken before the speaker finishes it, the next words as grey guesses, and how sure it is of each.</p>
+
+  <div class="picker" id="picker" role="group" aria-label="Choose a recording"></div>
+  <p class="tip" id="tip" hidden></p>
+
+  <section class="stage" aria-label="Player">
+    <div class="ctrl">
+      <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 12 12" id="pico"><path d="M3 1.5l7.5 4.5L3 10.5z"/></svg></button>
+      <div class="track" id="track" aria-label="Seek"><canvas id="cv"></canvas></div>
+      <span class="clock" id="clock">0.0 / 0.0 s</span>
+      <div class="speed" role="group" aria-label="Playback speed"><button data-r="1" aria-pressed="true">1×</button><button data-r="0.5" aria-pressed="false">½×</button></div>
+    </div>
+    <div class="screen" id="screen" aria-live="off"></div>
+    <div class="meters">
+      <div class="meter"><span class="k">Being spoken</span><span class="v" id="mw">—</span><div class="bar"><i id="mb"></i></div><span class="pct" id="mp">&nbsp;</span></div>
+      <div class="meter ghost"><span class="k">Next word, guessed</span><span class="v" id="g1">—</span><div class="bar"><i id="g1b"></i></div><span class="pct" id="g1p">&nbsp;</span></div>
+      <div class="meter ghost"><span class="k">Word after</span><span class="v" id="g2">—</span><div class="bar"><i id="g2b"></i></div><span class="pct" id="g2p">&nbsp;</span></div>
+    </div>
+    <div class="said" id="said"></div>
+  </section>
+
+  <div class="legend">
+    <span><i class="lg-u"></i>underline = confidence</span>
+    <span><i class="lg-now"></i>word still being spoken</span>
+    <span class="lg-g">grey = guessed ahead, with its %</span>
+  </div>
+  <p class="note">A replay of Earlybird's recorded output, not a model running in your browser: each recording was streamed through the 16.8 MB 4-bit model in 80 ms steps, and everything it showed was logged against the audio clock. Confidences are the model's own probabilities, with no calibration step; on our test sets, when it is 90% sure of a word it has not heard the end of, it is right 91–96% of the time.</p>
+</main>
+<footer class="foot"><span>Sahil Mahendrakar</span><span>Earlybird · draft demo</span></footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+const $ = id => document.getElementById(id);
+const audio = new Audio(); audio.preload = "auto";
+let cur = 0, raf = 0, rate = 1, endT = null, playing = false;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stepAt = (c, t) => { let lo = 0, hi = c.steps.length - 1, k = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (c.steps[m][0] <= t + 1e-6) { k = m; lo = m + 1; } else hi = m - 1; } return k < 0 ? null : c.steps[k]; };
+const pct = p => Math.round(p * 100) + "%";
+
+DATA.forEach((c, i) => {
+  const b = document.createElement("button"); b.className = "pick"; b.type = "button";
+  b.innerHTML = `<span class="cat">${esc(c.cat)}</span><span class="first">${esc(c.display.split(" ").slice(0, 6).join(" "))}…</span>`;
+  b.addEventListener("click", () => select(i)); $("picker").append(b);
+});
+document.querySelectorAll(".speed button").forEach(b => b.addEventListener("click", () => {
+  rate = +b.dataset.r; audio.playbackRate = rate;
+  document.querySelectorAll(".speed button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+}));
+
+function select(i) {
+  stop(); cur = i; const c = DATA[i]; endT = null;
+  document.querySelectorAll(".pick").forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false"));
+  audio.src = c.audio; audio.playbackRate = rate; audio.currentTime = 0;
+  $("said").innerHTML = `<b>What was said</b>` + c.words.map((w, j) => `<span class="s" data-j="${j}">${esc(c.shown[j] || w[0])}</span>`).join(" ");
+  $("tip").hidden = !c.tip; $("tip").textContent = c.tip || "";
+  render(0);
+}
+function now() { const c = DATA[cur]; if (endT !== null && playing) return Math.min(c.dur + c.tail, c.dur + (performance.now() - endT) / 1000 * rate); return audio.currentTime || 0; }
+function loop() { render(now()); if (now() >= DATA[cur].dur + DATA[cur].tail - 1e-3) { stop(); return; } raf = requestAnimationFrame(loop); }
+function play() {
+  const c = DATA[cur]; if (now() >= c.dur + c.tail - 0.01) { audio.currentTime = 0; endT = null; }
+  playing = true; if (endT === null) audio.play().catch(() => {}); $("pico").innerHTML = '<path d="M2.5 1.5h2.6v9H2.5zM6.9 1.5h2.6v9H6.9z"/>'; $("play").setAttribute("aria-label", "Pause");
+  cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+}
+function stop() { playing = false; audio.pause(); if (endT !== null) endT = null; cancelAnimationFrame(raf); $("pico").innerHTML = '<path d="M3 1.5l7.5 4.5L3 10.5z"/>'; $("play").setAttribute("aria-label", "Play"); }
+audio.addEventListener("ended", () => { endT = performance.now(); });
+$("play").addEventListener("click", () => playing ? stop() : play());
+document.addEventListener("keydown", e => { if (e.code === "Space" && e.target === document.body) { e.preventDefault(); $("play").click(); } });
+
+function seek(e) {
+  const r = $("track").getBoundingClientRect(), c = DATA[cur];
+  const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (c.dur + c.tail);
+  if (t < c.dur) { audio.currentTime = t; endT = null; } else { audio.currentTime = c.dur; endT = performance.now() - (t - c.dur) * 1000 / rate; }
+  render(t);
+}
+$("track").addEventListener("pointerdown", e => { seek(e); $("track").setPointerCapture(e.pointerId); });
+$("track").addEventListener("pointermove", e => { if (e.buttons) seek(e); });
+
+function render(t) {
+  const c = DATA[cur], st = stepAt(c, t), ws = st ? st[1] : [], gs = st ? st[2] : [];
+  // which on-screen word is still being spoken: the first one whose reference word has not ended
+  let nowIdx = -1;
+  for (let j = 0; j < ws.length; j++) if (c.words[j] && c.words[j][2] > t && c.words[j][1] <= t + 0.25) { nowIdx = j; break; }
+  if (nowIdx < 0 && ws.length && c.words[ws.length - 1] && c.words[ws.length - 1][2] > t) nowIdx = ws.length - 1;
+  let h = ws.map(([w, p], j) => `<span class="w${j === nowIdx ? " now" : ""}${p < 0.5 ? " low" : ""}" style="--c:${(0.15 + 0.85 * p).toFixed(2)}" title="${pct(p)} sure">${esc(c.cased[j] && c.cased[j].toLowerCase().replace(/[^a-z0-9']/g, "") === w ? c.cased[j] : w)}</span>`).join(" ");
+  if (gs.length) h += " " + gs.map(([g, p]) => `<span class="g">${esc(g)}<sup>${pct(p)}</sup></span>`).join(" ");
+  if (playing && t < c.dur) h += '<span class="caret"></span>';
+  if (!ws.length && !gs.length) h = t > 0 ? '<span class="caret"></span>' : '<span class="hint">Press play. The text appears here as the recording plays.</span>';
+  $("screen").innerHTML = h;
+  const m = nowIdx >= 0 ? ws[nowIdx] : null;
+  $("mw").textContent = m ? (c.cased[nowIdx] || m[0]) : "—"; $("mb").style.width = m ? pct(m[1]) : "0"; $("mp").textContent = m ? pct(m[1]) + " sure" : " ";
+  [[gs[0], "g1"], [gs[1], "g2"]].forEach(([g, id]) => { $(id).textContent = g ? g[0] : "—"; $(id + "b").style.width = g ? pct(g[1]) : "0"; $(id + "p").textContent = g ? pct(g[1]) + " sure" : " "; });
+  document.querySelectorAll("#said .s").forEach(s => s.classList.toggle("on", c.words[+s.dataset.j][1] <= t));
+  $("clock").textContent = `${Math.min(t, c.dur).toFixed(1)} / ${c.dur.toFixed(1)} s`;
+  drawTrack(t);
+}
+function drawTrack(t) {
+  const cv = $("cv"), c = DATA[cur], r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(r.width * dpr)) { cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr); }
+  const g = cv.getContext("2d"), W = cv.width, H = cv.height, T = c.dur + c.tail, n = c.env.length, bw = W / n;
+  g.clearRect(0, 0, W, H);
+  const hair = css("--hair"), ink = css("--ink"), acc = css("--accent");
+  for (let i = 0; i < n; i++) { const x = i * bw, a = c.env[i], hh = Math.max(2 * dpr, a * (H - 8 * dpr));
+    g.fillStyle = (i + 0.5) / n * T <= t ? ink : hair; g.fillRect(x + bw * 0.2, (H - hh) / 2, Math.max(1, bw * 0.6), hh); }
+  g.fillStyle = acc; g.fillRect(Math.min(W - 2 * dpr, t / T * W), 0, 2 * dpr, H);
+}
+window.addEventListener("resize", () => render(now()));
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => render(now())); new MutationObserver(() => render(now())).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]}); } catch (e) {}
+select(0);
+</script>

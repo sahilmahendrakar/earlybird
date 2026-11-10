@@ -1,0 +1,1 @@
+release/earlybird: weights file 16.79 MB; with config and tokenizer 17.61 MB (earlybird.py not counted)

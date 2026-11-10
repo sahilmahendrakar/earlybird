@@ -1,0 +1,16 @@
+moonshine-tiny kokoro_test: 500 utts, 63.3 min audio in 464s
+moonshine-tiny librispeech_test_clean: 462 utts, 60.8 min audio in 448s
+moonshine-small kokoro_test: 500 utts, 63.3 min audio in 4251s
+moonshine-small librispeech_test_clean: 462 utts, 60.8 min audio in 1137s
+moonshine-tiny-default kokoro_test: 500 utts, 63.3 min audio in 103s
+moonshine-tiny-default librispeech_test_clean: 462 utts, 60.8 min audio in 134s
+moonshine-small-default kokoro_test: 500 utts, 63.3 min audio in 318s
+moonshine-small-default librispeech_test_clean: 462 utts, 60.8 min audio in 409s
+nemotron-80ms kokoro_test: 150 utts, 19.4 min audio in 613s
+nemotron-80ms librispeech_test_clean: 150 utts, 20.8 min audio in 973s
+nemotron-160ms kokoro_test: 150 utts, 19.4 min audio in 483s
+nemotron-160ms librispeech_test_clean: 150 utts, 20.8 min audio in 385s
+nemotron-560ms kokoro_test: 150 utts, 19.4 min audio in 140s
+nemotron-560ms librispeech_test_clean: 150 utts, 20.8 min audio in 150s
+whisper-base.en kokoro_test: 150 utts, 19.4 min audio in 442s
+whisper-base.en librispeech_test_clean: 150 utts, 20.8 min audio in 527s
