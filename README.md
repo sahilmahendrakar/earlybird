@@ -11,6 +11,7 @@ saying them, with a confidence score.
 
 Write-up and live demo: [sahilmahendrakar.com/writings/earlybird](https://sahilmahendrakar.com/writings/earlybird)
 · Model: [huggingface.co/sahilmahendrakar/Earlybird-29M](https://huggingface.co/sahilmahendrakar/Earlybird-29M)
+· Paper: [arXiv:2611.14421](https://arxiv.org/abs/2611.14421)
 
 ## Quickstart
 
@@ -189,9 +190,12 @@ LICENSE too.
 
 ```bibtex
 @misc{mahendrakar2026earlybird,
-  title  = {Earlybird: predictive speech-to-text in 17 MB},
-  author = {Mahendrakar, Sahil},
-  year   = {2026},
-  url    = {https://sahilmahendrakar.com/writings/earlybird}
+  title         = {Earlybird: Predictive Streaming Speech Recognition in 29M Parameters},
+  author        = {Mahendrakar, Sahil},
+  year          = {2026},
+  eprint        = {2611.14421},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SD},
+  url           = {https://arxiv.org/abs/2611.14421}
 }
 ```
